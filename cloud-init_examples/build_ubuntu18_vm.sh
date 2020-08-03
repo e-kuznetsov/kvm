@@ -1,13 +1,14 @@
-#!/bin/bash
+#!/bin/bash -xe
+
 virsh undefine ubuntu18-vm-test
 virsh destroy ubuntu18-vm-test
 rm -f /var/lib/libvirt/images/ubuntu18-vm-test.qcow2
 rm -f /var/lib/libvirt/images/ubuntu18-vm-test-cloud-init.qcow2
 
-#qemu-img create -f qcow2 -o preallocation=metadata /var/lib/libvirt/images/ubuntu18-vm-test.qcow2 40G
-#virt-resize --quiet --expand /dev/sda1 /var/lib/libvirt/images/bionic-server-cloudimg-amd64.img /var/lib/libvirt/images/ubuntu18-vm-test.qcow2
 qemu-img create -b /var/lib/libvirt/images/bionic-server-cloudimg-amd64.img \
                 -f qcow2 /var/lib/libvirt/images/ubuntu18-vm-test.qcow2 40G
+
+qemu-img info /var/lib/libvirt/images/ubuntu18-vm-test.qcow2
 
 cloud-localds -v --network-config=network_config_static.cfg /var/lib/libvirt/images/ubuntu18-vm-test-cloud-init.qcow2 cloud_init.cfg
 
@@ -21,4 +22,3 @@ virt-install --name ubuntu18-vm-test \
   --network bridge=br0,model=virtio \
   --console pty,target_type=serial \
   --noautoconsole
-
